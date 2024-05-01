@@ -33,6 +33,27 @@
             background-color: #008CBA;
             color: white;
         }
+        /* Responsive styles */
+        @media (max-width: 600px) {
+            body {
+                font-size: 18px;
+            }
+            button {
+                font-size: 18px;
+                padding: 15px 30px;
+            }
+        }
+        /* Increase vertical spacing between options */
+        input[type="radio"] {
+            margin-bottom: 10px;
+        }
+        /* Message box styles */
+        #messageBox {
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -43,9 +64,7 @@
     <button id="back" onclick="previousQuestion()">Back</button>
     <button id="next" onclick="nextQuestion()">Next</button>
     <button id="reset" onclick="resetQuiz()">Reset Quiz</button>
-    <p id="result"></p>
-    <Br><Br><Br><Br><Br><Br><Br><Br>
-    <p>Disclaimer:</p>
+    <div id="messageBox"></div>
     <p>This quiz is provided for informational purposes only and is not intended as a substitute for professional medical advice, diagnosis, or treatment. The results of this quiz should not be used to diagnose or treat any health condition. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition. Never disregard professional medical advice or delay in seeking it because of something you have read or inferred from this quiz. The creator of this quiz disclaims any liability for the decisions you make based on this information.</p>
 
     <script>
@@ -84,7 +103,8 @@
             }
             div.innerHTML = `<p>Q${i+1}: ${questions[i]}</p>`;
             for (let j = 0; j < options.length; j++) {
-                div.innerHTML += `<input type="radio" name="q${i}" value="${options[j].charAt(0)}">${options[j]}<br>`;
+                // Wrap each input and its label text in a <label> element
+                div.innerHTML += `<label><input type="radio" name="q${i}" value="${options[j].charAt(0)}">${options[j]}</label><br>`;
             }
             document.getElementById('quiz').appendChild(div);
         }
@@ -129,6 +149,9 @@
             document.getElementsByClassName('question')[currentQuestion].classList.add('active');
             // Clear result
             document.getElementById('result').innerHTML = '';
+            // Reset message box
+            document.getElementById('messageBox').innerHTML = '';
+            document.getElementById('messageBox').style.backgroundColor = 'transparent';
         }
 
         function calculateScore() {
@@ -137,15 +160,37 @@
                 let answer = document.querySelector(`input[name="q${i}"]:checked`).value;
                 score += answers[answer];
             }
-            if (score < 80) {
-                document.getElementById('result').innerHTML = "Congratulations! You passed the quiz.";
-            } else {
-                document.getElementById('result').innerHTML = `You did not pass the quiz. Your score is: ${score}`;
+            let category;
+            let message;
+            let color;
+            if (score >= 60 && score < 70) {
+                category = "Category 1";
+                message = "Your score indicates that there is not an immediate situation. However, it's always a good idea to monitor your smartphone usage and ensure it's not interfering with your daily life.";
+                color = "#4CAF50"; // Green
+            } else if (score >= 70 && score < 80) {
+                category = "Category 2";
+                message = "Your score suggests that you might be developing some dependence on your smartphone. It might be beneficial to start incorporating some digital detox strategies into your routine.";
+                color = "#CDDC39"; // Light Green
+            } else if (score >= 80 && score < 90) {
+                category = "Category 3";
+                message = "Your score indicates a higher level of smartphone dependence. It's recommended to take steps to reduce your smartphone usage and consider seeking advice from a professional if you're finding it difficult to cut back.";
+                color = "#FFEB3B"; // Yellow
+            } else if (score >= 90 && score < 95) {
+                category = "Category 4";
+                message = "Your score suggests a significant level of smartphone dependence. It's strongly recommended to seek advice from a healthcare professional to discuss strategies for reducing your smartphone usage.";
+                color = "#FF9800"; // Orange
+            } else if (score >= 95 && score <= 100) {
+                category = "Category 5";
+                message = "Your score indicates a severe level of smartphone dependence. Immediate medical attention is needed. Please consult with a healthcare professional as soon as possible.";
+                color = "#F44336"; // Red
             }
-
-             // Hide the "Back" and "Next" buttons
+            document.getElementById('messageBox').innerHTML = `You fall into ${category}. ${message}`;
+            document.getElementById('messageBox').style.backgroundColor = color;
+            // Hide the "Back" and "Next" buttons
             document.getElementById('back').style.display = 'none';
             document.getElementById('next').style.display = 'none';
+            document.getElementById('reset').style.display = 'none';
+            
         }
     </script>
 </body>
