@@ -137,7 +137,7 @@
                 let answer = document.querySelector(`input[name="q${i}"]:checked`).value;
                 score += answers[answer];
             }
-            if (score < 13) {
+            if (score < 80) {
                 document.getElementById('result').innerHTML = "Congratulations! You passed the quiz.";
             } else {
                 document.getElementById('result').innerHTML = `You did not pass the quiz. Your score is: ${score}`;
