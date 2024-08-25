@@ -22,3 +22,5 @@ If you answered "yes" to most of these questions, you may be experiencing sympto
 * **Negative impact on relationships:** Strained relationships due to excessive phone use or neglecting other people.
 
 **If you believe you may be struggling with nomophobia, it's important to seek help.** There are various strategies and therapies available to manage this condition, including cognitive-behavioral therapy (CBT), mindfulness techniques, and digital detox practices.
+
+https://nomophobia.sarvesh.website/
