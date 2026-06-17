@@ -1,72 +1,712 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Nomophobia Quiz</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nomophobia Assessment | Discover Your Smartphone Dependence</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        .question {
-            border: 2px solid #000;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            display: none; /* Hide all questions initially */
+        :root {
+            /* Soft Dark Theme (Default) */
+            --bg-gradient: radial-gradient(circle at top, #1e1b4b 0%, #09090b 100%);
+            --card-bg: rgba(22, 22, 30, 0.8);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --primary: #818cf8; /* Soft Indigo */
+            --primary-glow: rgba(129, 140, 248, 0.25);
+            --primary-hover: #6366f1;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            
+            /* Soft Severity Colors (Pastel-style) */
+            --col-green: #34d399;   /* Soft Emerald */
+            --col-lime: #a3e635;    /* Soft Lime */
+            --col-yellow: #fbbf24;  /* Soft Amber */
+            --col-orange: #fb923c;  /* Soft Orange */
+            --col-red: #f87171;     /* Soft Red */
+            --col-rose: #fda4af;    /* Soft Rose */
+            
+            --bg-badge-green: rgba(52, 211, 153, 0.15);
+            --bg-badge-lime: rgba(163, 230, 53, 0.15);
+            --bg-badge-yellow: rgba(251, 191, 36, 0.15);
+            --bg-badge-orange: rgba(251, 146, 60, 0.15);
+            --bg-badge-red: rgba(248, 113, 113, 0.15);
+            --bg-badge-rose: rgba(253, 164, 175, 0.18);
+
+            --disclaimer-bg: rgba(255, 255, 255, 0.02);
+            --disclaimer-border: rgba(255, 255, 255, 0.05);
+            --option-bg: rgba(255, 255, 255, 0.02);
+            --option-border: rgba(255, 255, 255, 0.06);
+            --option-selected-bg: rgba(129, 140, 248, 0.08);
+
+            --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-        .question.active {
-            display: block; /* Only show the active question */
+
+        body[data-theme="light"] {
+            /* Soft Light Theme */
+            --bg-gradient: radial-gradient(circle at top, #f3f4f6 0%, #e5e7eb 100%);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(0, 0, 0, 0.08);
+            --primary: #4f46e5; /* Deeper Indigo for contrast */
+            --primary-glow: rgba(79, 70, 229, 0.15);
+            --primary-hover: #4338ca;
+            --text-main: #1f2937;
+            --text-muted: #4b5563;
+
+            /* Soft Severity Colors (Darker for readability on light BG) */
+            --col-green: #059669;
+            --col-lime: #65a30d;
+            --col-yellow: #d97706;
+            --col-orange: #ea580c;
+            --col-red: #dc2626;
+            --col-rose: #be185d;
+
+            --bg-badge-green: rgba(5, 150, 105, 0.1);
+            --bg-badge-lime: rgba(101, 163, 13, 0.1);
+            --bg-badge-yellow: rgba(217, 119, 6, 0.15);
+            --bg-badge-orange: rgba(234, 88, 12, 0.1);
+            --bg-badge-red: rgba(220, 38, 38, 0.1);
+            --bg-badge-rose: rgba(190, 24, 93, 0.1);
+
+            --disclaimer-bg: rgba(0, 0, 0, 0.02);
+            --disclaimer-border: rgba(0, 0, 0, 0.05);
+            --option-bg: rgba(0, 0, 0, 0.01);
+            --option-border: rgba(0, 0, 0, 0.06);
+            --option-selected-bg: rgba(79, 70, 229, 0.06);
         }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            margin: 10px;
+
+        /* Global Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            overflow-y: auto;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        /* App Container occupying at least 65% of viewport height */
+        .app-container {
+            width: 90%;
+            max-width: 700px;
+            min-height: 65vh;
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            padding: 40px;
+            box-shadow: 0 24px 64px -16px rgba(0, 0, 0, 0.35);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1;
+            transition: background 0.4s ease, border-color 0.4s ease;
+        }
+
+        /* Header Controls */
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 16px;
+        }
+
+        .app-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: var(--primary);
+            letter-spacing: -0.3px;
+        }
+
+        .logo-icon {
+            stroke: var(--primary);
+        }
+
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--card-border);
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
+            color: var(--text-main);
+            transition: all 0.25s ease;
         }
-        #next {
-            background-color: #4CAF50;
+
+        body[data-theme="light"] .theme-toggle-btn {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
+        }
+
+        body[data-theme="light"] .theme-toggle-btn:hover {
+            background: rgba(0, 0, 0, 0.06);
+        }
+
+        /* View Contents Base Styling */
+        .view-content {
+            display: none;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-direction: column;
+            justify-content: space-between;
+            flex-grow: 1;
+        }
+
+        .view-content.active {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Welcome Screen styling */
+        .welcome-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+            line-height: 1.3;
+        }
+
+        .welcome-intro {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .onboarding-disclaimer {
+            background: var(--disclaimer-bg);
+            border: 1px solid var(--disclaimer-border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .onboarding-disclaimer h3 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .onboarding-disclaimer p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Consent Checkbox */
+        .consent-checkbox-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            margin-bottom: 28px;
+            user-select: none;
+        }
+
+        .consent-checkbox-label input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 2.2px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.02);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            margin-top: 2px;
+        }
+
+        body[data-theme="light"] .custom-checkbox {
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        .consent-checkbox-label:hover .custom-checkbox {
+            border-color: var(--primary);
+        }
+
+        .consent-checkbox-label input[type="checkbox"]:checked + .custom-checkbox {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .consent-checkbox-label input[type="checkbox"]:checked + .custom-checkbox::after {
+            content: '';
+            width: 5px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2.5px 2.5px 0;
+            transform: rotate(45deg);
+            margin-bottom: 2px;
+        }
+
+        .consent-text {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            line-height: 1.45;
+        }
+
+        /* Progress Indicators */
+        .progress-container {
+            margin-bottom: 24px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        body[data-theme="light"] .progress-bar {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #818cf8, var(--primary));
+            border-radius: 10px;
+            transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* Form & Questions Container */
+        .question-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .question {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .question.active {
+            display: flex;
+            animation: questionFadeIn 0.35s ease-out forwards;
+        }
+
+        @keyframes questionFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 24px;
+            color: var(--text-main);
+        }
+
+        /* Options list choices */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--option-bg);
+            border: 1.5px solid var(--option-border);
+            border-radius: 16px;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .option-label:hover {
+            background: rgba(129, 140, 248, 0.06);
+            border-color: rgba(129, 140, 248, 0.3);
+            transform: translateY(-1.5px);
+        }
+
+        body[data-theme="light"] .option-label:hover {
+            background: rgba(79, 70, 229, 0.04);
+            border-color: rgba(79, 70, 229, 0.25);
+        }
+
+        .option-label:active {
+            transform: scale(0.99);
+        }
+
+        .option-label input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* Custom radio bubble styling */
+        .custom-radio {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            margin-right: 16px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        body[data-theme="light"] .custom-radio {
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .option-label:hover .custom-radio {
+            border-color: var(--primary);
+        }
+
+        .option-label input[type="radio"]:checked + .custom-radio {
+            border-color: var(--primary);
+            background: var(--primary);
+        }
+
+        .option-label input[type="radio"]:checked + .custom-radio::after {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .option-label.selected {
+            background: var(--option-selected-bg);
+            border-color: var(--primary);
+        }
+
+        .option-text {
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        /* Navigation Buttons styling */
+        .button-footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        button.primary-btn {
+            background: var(--primary);
             color: white;
+            box-shadow: 0 4px 14px var(--primary-glow);
+            border: none;
+            border-radius: 14px;
+            padding: 14px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: var(--font-family);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        #back {
-            background-color: #f44336;
-            color: white;
+
+        button.primary-btn:hover:not(:disabled) {
+            background: var(--primary-hover);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+            transform: translateY(-1px);
         }
-        #reset {
-            background-color: #008CBA;
-            color: white;
+
+        button.primary-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
         }
-        /* Responsive styles */
+
+        button.outline-btn {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 14px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: var(--font-family);
+            transition: all 0.25s ease;
+        }
+
+        button.outline-btn:hover {
+            background: rgba(255, 255, 255, 0.07);
+            transform: translateY(-1px);
+        }
+
+        body[data-theme="light"] button.outline-btn {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        body[data-theme="light"] button.outline-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Results Panel Card */
+        .result-card {
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            margin: 0px auto 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 3.5px solid var(--primary);
+            background: rgba(255, 255, 255, 0.01);
+            transition: border-color 0.8s ease, color 0.8s ease;
+        }
+
+        .score-number {
+            font-size: 3.1rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.4s ease;
+        }
+
+        .feedback-message {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 28px;
+            color: var(--text-main);
+            max-width: 500px;
+            font-weight: 400;
+        }
+
+        /* Bottom Disclaimer outside Card */
+        .page-footer-disclaimer {
+            max-width: 700px;
+            margin-top: 30px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.22);
+            line-height: 1.55;
+            text-align: justify;
+            padding: 0 8px;
+            font-weight: 300;
+        }
+
+        body[data-theme="light"] .page-footer-disclaimer {
+            color: rgba(0, 0, 0, 0.45);
+        }
+
+        /* Tablet & Mobile Responsiveness */
         @media (max-width: 600px) {
             body {
-                font-size: 18px;
+                padding: 16px 12px;
             }
-            button {
-                font-size: 18px;
-                padding: 15px 30px;
+            .app-container {
+                padding: 28px 20px;
+                border-radius: 24px;
+                min-height: 70vh;
             }
-        }
-        /* Increase vertical spacing between options */
-        input[type="radio"] {
-            margin-bottom: 10px;
-        }
-        /* Message box styles */
-        #messageBox {
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 10px;
-            color: white;
+            .welcome-title {
+                font-size: 1.5rem;
+            }
+            .question-text {
+                font-size: 1.12rem;
+            }
+            .option-label {
+                padding: 12px 16px;
+            }
+            .button-footer {
+                gap: 12px;
+            }
+            button.primary-btn, button.outline-btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Nomophobia Quiz</h1>
-    <form id="quiz">
-        <!-- Questions will be inserted here -->
-    </form>
-    <button id="back" onclick="previousQuestion()">Back</button>
-    <button id="next" onclick="nextQuestion()">Next</button>
-    <button id="reset" onclick="resetQuiz()">Reset Quiz</button>
-    <div id="messageBox"></div>
-    <p>This quiz is provided for informational purposes only and is not intended as a substitute for professional medical advice, diagnosis, or treatment. The results of this quiz should not be used to diagnose or treat any health condition. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition. Never disregard professional medical advice or delay in seeking it because of something you have read or inferred from this quiz. The creator of this quiz disclaims any liability for the decisions you make based on this information.</p>
+    <div class="app-container">
+        <!-- Persistent Brand Header Control Bar -->
+        <div class="header-controls">
+            <div class="app-logo">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="logo-icon"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                <span>Nomophobia Assessment</span>
+            </div>
+            <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Theme">
+                <!-- SVG Theme switch Icon injected dynamically -->
+            </button>
+        </div>
+
+        <!-- View 1: Onboarding Welcome Screen -->
+        <div id="welcome-view" class="view-content active" style="display: flex;">
+            <div style="flex-grow: 1;">
+                <h2 class="welcome-title">Are you dependent on your smartphone?</h2>
+                <p class="welcome-intro">Nomophobia represents the psychological dependence and anxiety related to being out of mobile phone contact. This science-derived assessment evaluates 20 core habits to gauge your attachment scale.</p>
+                
+                <div class="onboarding-disclaimer">
+                    <h3>Medical Disclaimer</h3>
+                    <p>This quiz is provided for educational and informational purposes only. It is not intended to serve as a diagnostic evaluation or as a substitute for professional clinical treatment, medical diagnosis, or therapy consultation.</p>
+                </div>
+            </div>
+
+            <div>
+                <label class="consent-checkbox-label">
+                    <input type="checkbox" id="consent-check" onchange="toggleStartBtn()">
+                    <span class="custom-checkbox"></span>
+                    <span class="consent-text">I understand and acknowledge the medical disclaimer.</span>
+                </label>
+                
+                <button id="start-btn" class="primary-btn" style="width: 100%;" onclick="startQuiz()" disabled>
+                    Start Quiz
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- View 2: Quiz Assessment Flow Screen -->
+        <div id="quiz-flow" class="view-content">
+            <div class="progress-container">
+                <div class="progress-header">
+                    <span id="progress-text">Question 1 of 20</span>
+                    <span id="progress-pct">5%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+            </div>
+            
+            <div class="question-wrapper">
+                <form id="quiz">
+                    <!-- Questions will be injected dynamically -->
+                </form>
+            </div>
+            
+            <div class="button-footer">
+                <button id="back" class="outline-btn" onclick="previousQuestion()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Back
+                </button>
+                <button id="next" class="primary-btn" onclick="nextQuestion()">
+                    Next
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- View 3: Quiz Assessment Results Scorecard Screen -->
+        <div id="result-view" class="view-content">
+            <div class="result-card">
+                <div class="score-circle">
+                    <span class="score-number" id="score-val">0</span>
+                    <span class="score-label">Score</span>
+                </div>
+                <div class="badge" id="category-badge">Category</div>
+                <p class="feedback-message" id="feedback-txt">Loading result review...</p>
+                
+                <button id="reset" class="primary-btn retake-btn" onclick="resetQuiz()">
+                    Retake Quiz
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <p class="page-footer-disclaimer">Disclaimer: This quiz is provided for informational purposes only and is not intended as a substitute for professional medical advice, diagnosis, or treatment. The results of this quiz should not be used to diagnose or treat any health condition. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition. Never disregard professional medical advice or delay in seeking it because of something you have read or inferred from this quiz. The creator of this quiz disclaims any liability for the decisions you make based on this information.</p>
+    
     <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "40bc17ba412d498bbab0c97066b2f418"}'></script><!-- End Cloudflare Web Analytics -->
+
     <script>
         const questions = [
             "Do you feel anxious when you can't find your phone?",
@@ -94,64 +734,165 @@
         const answers = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5};
         let currentQuestion = 0;
 
-        // Insert questions and options into the form
+        // Initialize Theme preference from localStorage
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+        renderThemeToggle();
+
+        // Insert questions and options dynamically
         for (let i = 0; i < questions.length; i++) {
             let div = document.createElement('div');
             div.className = 'question';
             if (i === 0) {
-                div.className += ' active'; // Make the first question active
+                div.className += ' active';
             }
-            div.innerHTML = `<p>Q${i+1}: ${questions[i]}</p>`;
+            
+            let qText = document.createElement('p');
+            qText.className = 'question-text';
+            qText.innerText = `Q${i+1}. ${questions[i]}`;
+            div.appendChild(qText);
+
+            let optionsList = document.createElement('div');
+            optionsList.className = 'options-list';
+            
             for (let j = 0; j < options.length; j++) {
-                // Wrap each input and its label text in a <label> element
-                div.innerHTML += `<label><input type="radio" name="q${i}" value="${options[j].charAt(0)}">${options[j]}</label><br>`;
+                let label = document.createElement('label');
+                label.className = 'option-label';
+                
+                label.innerHTML = `
+                    <input type="radio" name="q${i}" value="${options[j].charAt(0)}" onchange="selectOption(this, ${i})">
+                    <span class="custom-radio"></span>
+                    <span class="option-text">${options[j]}</span>
+                `;
+                optionsList.appendChild(label);
             }
+            div.appendChild(optionsList);
             document.getElementById('quiz').appendChild(div);
+        }
+        
+        updateProgress();
+
+        // Theme management controls
+        function toggleTheme() {
+            let current = document.body.getAttribute('data-theme');
+            let nextTheme = current === 'light' ? 'dark' : 'light';
+            document.body.setAttribute('data-theme', nextTheme);
+            localStorage.setItem('theme', nextTheme);
+            renderThemeToggle();
+        }
+
+        function renderThemeToggle() {
+            let toggleBtn = document.getElementById('theme-toggle');
+            let isLight = document.body.getAttribute('data-theme') === 'light';
+            if (isLight) {
+                // Sun Icon (switching to Dark mode)
+                toggleBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+            } else {
+                // Moon Icon (switching to Light mode)
+                toggleBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+            }
+        }
+
+        // Onboarding Screen action handlers
+        function toggleStartBtn() {
+            let checked = document.getElementById('consent-check').checked;
+            document.getElementById('start-btn').disabled = !checked;
+        }
+
+        function startQuiz() {
+            switchView('welcome-view', 'quiz-flow');
+        }
+
+        // Interactive Page View Transitions helper
+        function switchView(fromId, toId) {
+            let fromElem = document.getElementById(fromId);
+            let toElem = document.getElementById(toId);
+            
+            fromElem.classList.remove('active');
+            setTimeout(() => {
+                fromElem.style.display = 'none';
+                toElem.style.display = 'flex';
+                // Force layout reflow
+                toElem.offsetHeight;
+                toElem.classList.add('active');
+            }, 300);
+        }
+
+        function selectOption(input, index) {
+            let labels = input.closest('.options-list').querySelectorAll('.option-label');
+            labels.forEach(l => l.classList.remove('selected'));
+            
+            if (input.checked) {
+                input.closest('.option-label').classList.add('selected');
+            }
+        }
+
+        function updateProgress() {
+            let current = currentQuestion + 1;
+            let total = questions.length;
+            if (currentQuestion >= total) {
+                document.getElementById('progress-text').innerText = `Assessment Complete`;
+                document.getElementById('progress-pct').innerText = `100%`;
+                document.getElementById('progress-fill').style.width = `100%`;
+            } else {
+                let pct = Math.round((current / total) * 100);
+                document.getElementById('progress-text').innerText = `Question ${current} of ${total}`;
+                document.getElementById('progress-pct').innerText = `${pct}%`;
+                document.getElementById('progress-fill').style.width = `${pct}%`;
+            }
         }
 
         function nextQuestion() {
-            // Check if an option is selected
             if (!document.querySelector(`input[name="q${currentQuestion}"]:checked`)) {
                 alert('Please select an option!');
                 return;
             }
-            // Hide current question
-            document.getElementsByClassName('question')[currentQuestion].classList.remove('active');
+            
+            let currentElem = document.getElementsByClassName('question')[currentQuestion];
+            currentElem.classList.remove('active');
+            
             currentQuestion++;
-            // If there are more questions, show the next one
+            
             if (currentQuestion < questions.length) {
-                document.getElementsByClassName('question')[currentQuestion].classList.add('active');
-            } else { // If not, calculate the score
+                let nextElem = document.getElementsByClassName('question')[currentQuestion];
+                nextElem.classList.add('active');
+                updateProgress();
+            } else {
                 calculateScore();
             }
         }
 
         function previousQuestion() {
             if (currentQuestion > 0) {
-                // Hide current question
-                document.getElementsByClassName('question')[currentQuestion].classList.remove('active');
+                if (currentQuestion < questions.length) {
+                    let currentElem = document.getElementsByClassName('question')[currentQuestion];
+                    currentElem.classList.remove('active');
+                }
                 currentQuestion--;
-                // Show previous question
-                document.getElementsByClassName('question')[currentQuestion].classList.add('active');
+                let prevElem = document.getElementsByClassName('question')[currentQuestion];
+                prevElem.classList.add('active');
+                updateProgress();
             }
         }
 
         function resetQuiz() {
-            // Hide current question
-            document.getElementsByClassName('question')[currentQuestion].classList.remove('active');
-            currentQuestion = 0;
-            // Reset all selected options
-            let selectedOptions = document.querySelectorAll('input[type="radio"]:checked');
-            for (let i = 0; i < selectedOptions.length; i++) {
-                selectedOptions[i].checked = false;
-            }
-            // Show first question
-            document.getElementsByClassName('question')[currentQuestion].classList.add('active');
-            // Clear result
-            document.getElementById('result').innerHTML = '';
-            // Reset message box
-            document.getElementById('messageBox').innerHTML = '';
-            document.getElementById('messageBox').style.backgroundColor = 'transparent';
+            switchView('result-view', 'quiz-flow');
+            
+            setTimeout(() => {
+                let activeQuestions = document.querySelectorAll('.question.active');
+                activeQuestions.forEach(q => q.classList.remove('active'));
+                
+                currentQuestion = 0;
+                
+                let selectedOptions = document.querySelectorAll('input[type="radio"]:checked');
+                selectedOptions.forEach(opt => opt.checked = false);
+                
+                let selectedLabels = document.querySelectorAll('.option-label.selected');
+                selectedLabels.forEach(lbl => lbl.classList.remove('selected'));
+                
+                document.getElementsByClassName('question')[currentQuestion].classList.add('active');
+                updateProgress();
+            }, 300);
         }
 
         function calculateScore() {
@@ -160,37 +901,67 @@
                 let answer = document.querySelector(`input[name="q${i}"]:checked`).value;
                 score += answers[answer];
             }
+            
             let category;
             let message;
-            let color;
-            if (score >= 60 && score < 70) {
-                category = "Category 1";
-                message = "Your score indicates that there is not an immediate situation. However, it's always a good idea to monitor your smartphone usage and ensure it's not interfering with your daily life.";
-                color = "#4CAF50"; // Green
+            let colorVar;
+            let badgeBgVar;
+            let badgeTextVar;
+
+            if (score >= 20 && score < 60) {
+                category = "Mild / No Dependence";
+                message = "Your score indicates little to no smartphone dependence. You have a healthy, balanced relationship with your device. Keep up the good habits!";
+                colorVar = "var(--col-green)";
+                badgeBgVar = "var(--bg-badge-green)";
+                badgeTextVar = "var(--col-green)";
+            } else if (score >= 60 && score < 70) {
+                category = "Borderline Dependence";
+                message = "Your score indicates borderline nomophobia. While there isn't an immediate issue, it's a good idea to monitor your smartphone usage and ensure it doesn't interfere with your day-to-day real-world activities.";
+                colorVar = "var(--col-lime)";
+                badgeBgVar = "var(--bg-badge-lime)";
+                badgeTextVar = "var(--col-lime)";
             } else if (score >= 70 && score < 80) {
-                category = "Category 2";
-                message = "Your score suggests that you might be developing some dependence on your smartphone. It might be beneficial to start incorporating some digital detox strategies into your routine.";
-                color = "#CDDC39"; // Light Green
+                category = "Mild Dependence";
+                message = "Your score suggests that you might be developing some psychological dependence on your smartphone. It could be beneficial to start incorporating digital detox strategies (like scheduled phone-free times) into your routine.";
+                colorVar = "var(--col-yellow)";
+                badgeBgVar = "var(--bg-badge-yellow)";
+                badgeTextVar = "var(--col-yellow)";
             } else if (score >= 80 && score < 90) {
-                category = "Category 3";
-                message = "Your score indicates a higher level of smartphone dependence. It's recommended to take steps to reduce your smartphone usage and consider seeking advice from a professional if you're finding it difficult to cut back.";
-                color = "#FFEB3B"; // Yellow
+                category = "Moderate Nomophobia";
+                message = "Your score indicates a higher level of smartphone dependence. We recommend taking conscious steps to reduce your screen time, and considering advice from a health counselor if you find it hard to disconnect.";
+                colorVar = "var(--col-orange)";
+                badgeBgVar = "var(--bg-badge-orange)";
+                badgeTextVar = "var(--col-orange)";
             } else if (score >= 90 && score < 95) {
-                category = "Category 4";
-                message = "Your score suggests a significant level of smartphone dependence. It's strongly recommended to seek advice from a healthcare professional to discuss strategies for reducing your smartphone usage.";
-                color = "#FF9800"; // Orange
+                category = "Significant Dependence";
+                message = "Your score suggests a significant level of smartphone dependence. It's highly recommended to consult a healthcare professional or mindfulness coach to explore targeted strategies for rebalancing your lifestyle.";
+                colorVar = "var(--col-red)";
+                badgeBgVar = "var(--bg-badge-red)";
+                badgeTextVar = "var(--col-red)";
             } else if (score >= 95 && score <= 100) {
-                category = "Category 5";
-                message = "Your score indicates a severe level of smartphone dependence. Immediate medical attention is needed. Please consult with a healthcare professional as soon as possible.";
-                color = "#F44336"; // Red
+                category = "Severe Nomophobia";
+                message = "Your score indicates severe nomophobia. Immediate attention is recommended. Please consult with a healthcare professional to discuss structured behavioral strategies or clinical support.";
+                colorVar = "var(--col-rose)";
+                badgeBgVar = "var(--bg-badge-rose)";
+                badgeTextVar = "var(--col-rose)";
             }
-            document.getElementById('messageBox').innerHTML = `You fall into ${category}. ${message}`;
-            document.getElementById('messageBox').style.backgroundColor = color;
-            // Hide the "Back" and "Next" buttons
-            document.getElementById('back').style.display = 'none';
-            document.getElementById('next').style.display = 'none';
-            document.getElementById('reset').style.display = 'none';
+
+            switchView('quiz-flow', 'result-view');
             
+            setTimeout(() => {
+                document.getElementById('score-val').innerText = score;
+                
+                let badge = document.getElementById('category-badge');
+                badge.innerText = category;
+                badge.style.backgroundColor = badgeBgVar;
+                badge.style.color = badgeTextVar;
+                
+                let scoreCircle = document.querySelector('.score-circle');
+                scoreCircle.style.borderColor = colorVar;
+                scoreCircle.style.color = colorVar;
+                
+                document.getElementById('feedback-txt').innerText = message;
+            }, 300);
         }
     </script>
 </body>
